@@ -1,0 +1,21 @@
+﻿using System.Collections.Generic;
+
+namespace BookmarkManager.Models
+{
+    public class Category
+    {
+        public int Id
+        {
+            get; set;
+        }
+        public string Name
+        {
+            get; set;
+        }
+
+        public ICollection<Bookmark> Bookmarks
+        {
+            get; set;
+        }
+    }
+}
