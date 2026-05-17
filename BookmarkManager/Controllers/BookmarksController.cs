@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using BookmarkManager.Data;
+﻿using BookmarkManager.Data;
 using BookmarkManager.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using X.PagedList;
+using X.PagedList.Extensions;
 
 namespace BookmarkManager.Controllers
 {
@@ -25,14 +27,61 @@ namespace BookmarkManager.Controllers
         }
 
         // GET: Bookmarks
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? categoryId, int? page)
         {
+            ViewBag.CurrentSort = sortOrder;
+            ViewBag.DateSortParm = String.IsNullOrEmpty(sortOrder) ? "date_desc" : "";
+            ViewBag.DescSortParm = sortOrder == "desc" ? "desc_desc" : "desc";
+
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+            ViewBag.CurrentCategory = categoryId;
+
             var userId = _userManager.GetUserId(User);
-            var applicationDbContext = _context.Bookmarks
+            var bookmarks = _context.Bookmarks
                 .Include(b => b.Category)
                 .Include(b => b.User)
                 .Where(b => b.UserId == userId);
-            return View(await applicationDbContext.ToListAsync());
+
+            if (categoryId.HasValue)
+            {
+                bookmarks = bookmarks.Where(b => b.CategoryId == categoryId.Value);
+            }
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                bookmarks = bookmarks.Where(b => b.Description.Contains(searchString) || b.Url.Contains(searchString));
+            }
+
+            switch (sortOrder)
+            {
+                case "date_desc":
+                    bookmarks = bookmarks.OrderByDescending(b => b.CreatedAt);
+                    break;
+                case "desc":
+                    bookmarks = bookmarks.OrderBy(b => b.Description);
+                    break;
+                case "desc_desc":
+                    bookmarks = bookmarks.OrderByDescending(b => b.Description);
+                    break;
+                default:
+                    bookmarks = bookmarks.OrderBy(b => b.CreatedAt);
+                    break;
+            }
+
+            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", categoryId);
+
+            int pageSize = 5;
+            int pageNumber = (page ?? 1);
+            return View(bookmarks.ToPagedList(pageNumber, pageSize));
         }
 
         // GET: Bookmarks/Details/5

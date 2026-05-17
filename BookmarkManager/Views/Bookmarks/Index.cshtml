@@ -1,59 +1,79 @@
-﻿@model IEnumerable<BookmarkManager.Models.Bookmark>
+﻿@using X.PagedList.Mvc.Core
+@model X.PagedList.IPagedList<BookmarkManager.Models.Bookmark>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Moje zakładki";
 }
 
-<h1>Index</h1>
+<h1>Moje zakładki</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Dodaj nową zakładkę</a>
 </p>
-<table class="table">
-    <thead>
+
+<form asp-action="Index" method="get" class="mb-4">
+    <div class="form-actions no-color row align-items-end">
+        <div class="col-md-4">
+            <label>Wyszukaj w opisie lub URL:</label>
+            <input type="text" name="SearchString" value="@ViewBag.CurrentFilter" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label>Kategoria:</label>
+            <select name="categoryId" class="form-control" asp-items="ViewBag.Categories">
+                <option value="">Wszystkie</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <input type="submit" value="Filtruj" class="btn btn-outline-dark" />
+            <a asp-action="Index" class="btn btn-outline-secondary">Wyczyść</a>
+        </div>
+    </div>
+</form>
+
+<table class="table table-hover">
+    <thead class="table-dark">
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Url)
+                <a asp-action="Index" asp-route-sortOrder="@ViewBag.DateSortParm" asp-route-currentFilter="@ViewBag.CurrentFilter" asp-route-categoryId="@ViewBag.CurrentCategory" class="text-white text-decoration-none">Data utworzenia</a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+                <a asp-action="Index" asp-route-sortOrder="@ViewBag.DescSortParm" asp-route-currentFilter="@ViewBag.CurrentFilter" asp-route-categoryId="@ViewBag.CurrentCategory" class="text-white text-decoration-none">Opis zakładki</a>
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Category)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th></th>
+            <th>Adres URL</th>
+            <th>Kategoria</th>
+            <th>Akcje</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Url)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedAt)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    <a href="@item.Url" target="_blank" class="btn btn-sm btn-success">Przejdź do linku</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category.Name)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-info">Edytuj</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Usuń</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+<br />
+<div class="d-flex justify-content-center">
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter, categoryId = ViewBag.CurrentCategory }), new PagedListRenderOptions
+    {
+        LiElementClasses = new string[] { "page-item" },
+        PageClasses = new string[] { "page-link" }
+    })
+</div>
