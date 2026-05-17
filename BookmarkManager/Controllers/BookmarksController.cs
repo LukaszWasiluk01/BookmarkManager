@@ -1,0 +1,202 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using BookmarkManager.Data;
+using BookmarkManager.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+
+namespace BookmarkManager.Controllers
+{
+    [Authorize]
+    public class BookmarksController : Controller
+    {
+        private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
+
+        public BookmarksController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        {
+            _context = context;
+            _userManager = userManager;
+        }
+
+        // GET: Bookmarks
+        public async Task<IActionResult> Index()
+        {
+            var userId = _userManager.GetUserId(User);
+            var applicationDbContext = _context.Bookmarks
+                .Include(b => b.Category)
+                .Include(b => b.User)
+                .Where(b => b.UserId == userId);
+            return View(await applicationDbContext.ToListAsync());
+        }
+
+        // GET: Bookmarks/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var userId = _userManager.GetUserId(User);
+            var bookmark = await _context.Bookmarks
+                .Include(b => b.Category)
+                .Include(b => b.User)
+                .FirstOrDefaultAsync(m => m.Id == id && m.UserId == userId);
+            if (bookmark == null)
+            {
+                return NotFound();
+            }
+
+            return View(bookmark);
+        }
+
+        // GET: Bookmarks/Create
+        public IActionResult Create()
+        {
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
+            return View();
+        }
+
+        // POST: Bookmarks/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Id,Url,Description,CategoryId")] Bookmark bookmark)
+        {
+            ModelState.Remove("UserId");
+            ModelState.Remove("User");
+            ModelState.Remove("Category");
+
+            if (ModelState.IsValid)
+            {
+                bookmark.UserId = _userManager.GetUserId(User);
+                bookmark.CreatedAt = DateTime.Now;
+
+                _context.Add(bookmark);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", bookmark.CategoryId);
+            return View(bookmark);
+        }
+
+        // GET: Bookmarks/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var userId = _userManager.GetUserId(User);
+            var bookmark = await _context.Bookmarks.FirstOrDefaultAsync(b => b.Id == id && b.UserId == userId);
+            if (bookmark == null)
+            {
+                return NotFound();
+            }
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", bookmark.CategoryId);
+            return View(bookmark);
+        }
+
+        // POST: Bookmarks/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Url,Description,CategoryId")] Bookmark bookmark)
+        {
+            if (id != bookmark.Id)
+            {
+                return NotFound();
+            }
+
+            ModelState.Remove("UserId");
+            ModelState.Remove("User");
+            ModelState.Remove("Category");
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var userId = _userManager.GetUserId(User);
+                    var existingBookmark = await _context.Bookmarks.FirstOrDefaultAsync(b => b.Id == id && b.UserId == userId);
+
+                    if (existingBookmark == null)
+                    {
+                        return NotFound();
+                    }
+
+                    existingBookmark.Url = bookmark.Url;
+                    existingBookmark.Description = bookmark.Description;
+                    existingBookmark.CategoryId = bookmark.CategoryId;
+
+                    _context.Update(existingBookmark);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!BookmarkExists(bookmark.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", bookmark.CategoryId);
+            return View(bookmark);
+        }
+
+        // GET: Bookmarks/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var userId = _userManager.GetUserId(User);
+            var bookmark = await _context.Bookmarks
+                .Include(b => b.Category)
+                .Include(b => b.User)
+                .FirstOrDefaultAsync(m => m.Id == id && m.UserId == userId);
+            if (bookmark == null)
+            {
+                return NotFound();
+            }
+
+            return View(bookmark);
+        }
+
+        // POST: Bookmarks/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+            var bookmark = await _context.Bookmarks.FirstOrDefaultAsync(b => b.Id == id && b.UserId == userId);
+            if (bookmark != null)
+            {
+                _context.Bookmarks.Remove(bookmark);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool BookmarkExists(int id)
+        {
+            return _context.Bookmarks.Any(e => e.Id == id);
+        }
+    }
+}
