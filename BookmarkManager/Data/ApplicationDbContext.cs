@@ -23,6 +23,10 @@ namespace BookmarkManager.Data
         {
             get; set;
         }
+        public DbSet<Friendship> Friendships
+        {
+            get; set;
+        }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -33,6 +37,18 @@ namespace BookmarkManager.Data
                 new Category { Id = 2, Name = "netflix" },
                 new Category { Id = 3, Name = "blogi" }
             );
+
+            builder.Entity<Friendship>()
+                .HasOne(f => f.Requester)
+                .WithMany()
+                .HasForeignKey(f => f.RequesterId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Friendship>()
+                .HasOne(f => f.Addressee)
+                .WithMany()
+                .HasForeignKey(f => f.AddresseeId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

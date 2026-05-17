@@ -1,0 +1,60 @@
+﻿@model IEnumerable<BookmarkManager.Models.Friendship>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    ViewData["Title"] = "Moi znajomi";
+    var currentUserId = UserManager.GetUserId(User);
+}
+
+<h1>Moi znajomi</h1>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<div class="card mb-4 mt-3">
+    <div class="card-body">
+        <form asp-action="SendRequest" method="post" class="d-flex">
+            <input type="email" name="addresseeEmail" class="form-control me-2" placeholder="Wpisz email znajomego" required />
+            <button type="submit" class="btn btn-primary">Wyślij zaproszenie</button>
+        </form>
+    </div>
+</div>
+
+<table class="table table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Nazwa użytkownika</th>
+            <th>Link do usunięcia znajomego</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="2" class="text-center">Nie znaleziono żadnych znajomych.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                var friend = item.RequesterId == currentUserId ? item.Addressee : item.Requester;
+                <tr>
+                    <td class="align-middle">@friend.Email</td>
+                    <td>
+                        <form asp-action="RemoveFriend" method="post" asp-route-id="@item.Id">
+                            <button type="submit" class="btn btn-sm btn-danger">Usuń znajomego</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

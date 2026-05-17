@@ -1,0 +1,38 @@
+﻿@model IEnumerable<BookmarkManager.Models.Friendship>
+
+@{
+    ViewData["Title"] = "Oczekujące zaproszenia";
+}
+
+<h1>Oczekujące zaproszenia</h1>
+
+<table class="table table-hover mt-4">
+    <thead class="table-dark">
+        <tr>
+            <th>Nazwa użytkownika</th>
+            <th>Przycisk do akceptacji zaproszenia</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="2" class="text-center">Nie znaleziono oczekujących zaproszeń.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="align-middle">@item.Requester.Email</td>
+                    <td>
+                        <form asp-action="AcceptRequest" method="post" asp-route-id="@item.Id">
+                            <button type="submit" class="btn btn-sm btn-success">Akceptuj zaproszenie</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
