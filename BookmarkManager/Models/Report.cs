@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace BookmarkManager.Models
 {
@@ -8,10 +9,13 @@ namespace BookmarkManager.Models
         {
             get; set;
         }
+
+        [Required(ErrorMessage = "Treść zgłoszenia jest wymagana.")]
         public string Content
         {
             get; set;
         }
+
         public DateTime CreatedAt
         {
             get; set;

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace BookmarkManager.Models
 {
@@ -8,14 +9,20 @@ namespace BookmarkManager.Models
         {
             get; set;
         }
+
+        [Required(ErrorMessage = "Adres URL jest wymagany.")]
+        [Url(ErrorMessage = "Podano niepoprawny format adresu URL.")]
         public string Url
         {
             get; set;
         }
+
+        [Required(ErrorMessage = "Opis zakładki jest wymagany.")]
         public string Description
         {
             get; set;
         }
+
         public DateTime CreatedAt
         {
             get; set;
