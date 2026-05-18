@@ -1,9 +1,7 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using BookmarkManager.Data;
+using BookmarkManager.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BookmarkManager.Data;
-using BookmarkManager.Models;
 
 namespace BookmarkManager.Controllers
 {

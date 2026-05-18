@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace BookmarkManager.Models
+﻿namespace BookmarkManager.Models
 {
     public class Category
     {
