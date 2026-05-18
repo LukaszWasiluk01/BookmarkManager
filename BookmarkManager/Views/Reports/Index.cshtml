@@ -1,0 +1,36 @@
+﻿@model IEnumerable<BookmarkManager.Models.Report>
+
+@{
+    ViewData["Title"] = "Zgłoszenia";
+}
+
+<h1>Zgłoszenia</h1>
+
+<table class="table table-hover mt-4">
+    <thead class="table-dark">
+        <tr>
+            <th>Nick (Email)</th>
+            <th>Treść</th>
+            <th>Data</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="3" class="text-center">Nie znaleziono żadnych zgłoszeń.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="fw-bold">@item.User.Email</td>
+                    <td>@item.Content</td>
+                    <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

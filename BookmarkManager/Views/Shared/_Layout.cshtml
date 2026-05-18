@@ -36,6 +36,12 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Friends" asp-action="Requests">Zaproszenia</a>
                             </li>
+                            @if (User.Identity.Name == "admin@example.com")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-danger fw-bold" asp-area="" asp-controller="Reports" asp-action="Index">Zgłoszenia (Admin)</a>
+                                </li>
+                            }
                         }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Categories" asp-action="Index">Kategorie</a>
@@ -55,9 +61,18 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - BookmarkManager - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="border-top footer text-muted mt-5">
+        <div class="container text-center py-3">
+            @if (User.Identity.IsAuthenticated)
+            {
+                <form asp-controller="Reports" asp-action="Create" method="post" class="d-inline-flex align-items-center mb-3">
+                    <input type="text" name="content" class="form-control me-2" placeholder="Wpisz treść zgłoszenia" required style="width: 300px;" />
+                    <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">Wyślij zgłoszenie</button>
+                </form>
+                <br />
+            }
+            &copy; 2024 - BookmarkManager - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
