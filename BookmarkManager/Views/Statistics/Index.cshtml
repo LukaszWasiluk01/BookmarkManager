@@ -1,0 +1,56 @@
+﻿@model BookmarkManager.Models.StatisticsViewModel
+
+@{
+    ViewData["Title"] = "Statystyki aplikacji";
+}
+
+<h1 class="mb-4 text-center">Statystyki Menadżera Zakładek</h1>
+
+<div class="row text-center mt-5">
+    <div class="col-md-4 mb-4">
+        <div class="card bg-primary text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title">Zarejestrowani użytkownicy</h5>
+                <h1 class="display-4 fw-bold mt-3">@Model.TotalUsers</h1>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title">Wszystkie dodane zakładki</h5>
+                <h1 class="display-4 fw-bold mt-3">@Model.TotalBookmarks</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card bg-info text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title">Dostępne kategorie</h5>
+                <h1 class="display-4 fw-bold mt-3">@Model.TotalCategories</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row text-center mt-3">
+    <div class="col-md-6 mb-4">
+        <div class="card bg-dark text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Najpopularniejsza kategoria</h5>
+                <h2 class="mt-4">@Model.MostPopularCategory</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card bg-secondary text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title text-light">Najaktywniejszy użytkownik</h5>
+                <h2 class="mt-4">@Model.MostActiveUser</h2>
+            </div>
+        </div>
+    </div>
+</div>
