@@ -306,6 +306,76 @@ namespace BookmarkManager.Controllers
             return View(bookmarks.ToPagedList(pageNumber, pageSize));
         }
 
+        public async Task<IActionResult> FriendBookmarks(string id, string sortOrder, string currentFilter, string searchString, int? categoryId, int? page)
+        {
+            ViewBag.CurrentSort = sortOrder;
+            ViewBag.DateSortParm = String.IsNullOrEmpty(sortOrder) ? "date_desc" : "";
+            ViewBag.DescSortParm = sortOrder == "desc" ? "desc_desc" : "desc";
+
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+            ViewBag.CurrentCategory = categoryId;
+            ViewBag.FriendId = id;
+
+            var currentUserId = _userManager.GetUserId(User);
+
+            var isFriend = await _context.Friendships
+                .AnyAsync(f => ((f.RequesterId == currentUserId && f.AddresseeId == id) || (f.RequesterId == id && f.AddresseeId == currentUserId)) && f.IsAccepted);
+
+            if (!isFriend)
+            {
+                return NotFound();
+            }
+
+            var friendUser = await _userManager.FindByIdAsync(id);
+            ViewBag.FriendEmail = friendUser?.Email;
+
+            var bookmarks = _context.Bookmarks
+                .Include(b => b.Category)
+                .Include(b => b.User)
+                .Where(b => b.UserId == id);
+
+            if (categoryId.HasValue)
+            {
+                bookmarks = bookmarks.Where(b => b.CategoryId == categoryId.Value);
+            }
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                bookmarks = bookmarks.Where(b => b.Description.Contains(searchString) || b.Url.Contains(searchString));
+            }
+
+            switch (sortOrder)
+            {
+                case "date_desc":
+                    bookmarks = bookmarks.OrderByDescending(b => b.CreatedAt);
+                    break;
+                case "desc":
+                    bookmarks = bookmarks.OrderBy(b => b.Description);
+                    break;
+                case "desc_desc":
+                    bookmarks = bookmarks.OrderByDescending(b => b.Description);
+                    break;
+                default:
+                    bookmarks = bookmarks.OrderByDescending(b => b.CreatedAt);
+                    break;
+            }
+
+            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", categoryId);
+
+            int pageSize = 5;
+            int pageNumber = (page ?? 1);
+            return View(bookmarks.ToPagedList(pageNumber, pageSize));
+        }
+
         private bool BookmarkExists(int id)
         {
             return _context.Bookmarks.Any(e => e.Id == id);

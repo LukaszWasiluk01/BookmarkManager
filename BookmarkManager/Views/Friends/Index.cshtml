@@ -47,7 +47,11 @@
             {
                 var friend = item.RequesterId == currentUserId ? item.Addressee : item.Requester;
                 <tr>
-                    <td class="align-middle">@friend.Email</td>
+                    <td class="align-middle">
+                        <a asp-controller="Bookmarks" asp-action="FriendBookmarks" asp-route-id="@friend.Id" class="text-decoration-none fw-bold">
+                            @friend.Email
+                        </a>
+                    </td>
                     <td>
                         <form asp-action="RemoveFriend" method="post" asp-route-id="@item.Id">
                             <button type="submit" class="btn btn-sm btn-danger">Usuń znajomego</button>
