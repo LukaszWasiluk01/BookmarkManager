@@ -22,7 +22,7 @@ namespace BookmarkManager.Controllers
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user.Email != "admin@example.com")
+            if (user == null || user.Email != "admin@example.com")
             {
                 return RedirectToAction("Index", "Bookmarks");
             }

@@ -2,11 +2,13 @@
 using BookmarkManager.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BookmarkManager.Controllers
 {
     public class CategoriesController : Controller
     {
+        [Authorize]
         private readonly ApplicationDbContext _context;
 
         public CategoriesController(ApplicationDbContext context)
