@@ -1,8 +1,23 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Strona główna";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center mt-5">
+    <h1 class="display-4 fw-bold text-primary">Menadżer Zakładek</h1>
+    <p class="lead mt-3">Witaj w aplikacji do wygodnego zarządzania Twoimi ulubionymi linkami internetowymi.</p>
+    <hr class="my-4" style="max-width: 400px; margin: 0 auto;" />
+    <p>System umożliwia łatwe kategoryzowanie zbiorów, bezpieczne logowanie, dodawanie znajomych oraz podgląd globalnych statystyk serwisu.</p>
+    
+    <div class="mt-4">
+        @if (!User.Identity.IsAuthenticated)
+        {
+            <a class="btn btn-primary btn-lg me-2" asp-area="Identity" asp-page="/Account/Login">Zaloguj się</a>
+            <a class="btn btn-outline-secondary btn-lg" asp-area="Identity" asp-page="/Account/Register">Zarejestruj się</a>
+        }
+        else
+        {
+            <a class="btn btn-success btn-lg me-2" asp-controller="Bookmarks" asp-action="Index">Przejdź do moich zakładek</a>
+            <a class="btn btn-info btn-lg text-white" asp-controller="Statistics" asp-action="Index">Zobacz statystyki serwisu</a>
+        }
+    </div>
 </div>
