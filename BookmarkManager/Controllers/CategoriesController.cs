@@ -31,7 +31,9 @@ namespace BookmarkManager.Controllers
             }
 
             var category = await _context.Categories
+                .Include(c => c.Bookmarks)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (category == null)
             {
                 return NotFound();

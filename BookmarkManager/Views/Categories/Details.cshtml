@@ -1,24 +1,55 @@
 ﻿@model BookmarkManager.Models.Category
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Szczegóły kategorii";
 }
 
-<h1>Details</h1>
+<h1>Szczegóły kategorii</h1>
 
 <div>
-    <h4>Category</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
+        <dt class="col-sm-2">
+            Nazwa kategorii
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Name)
         </dd>
     </dl>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<h4 class="mt-5">Zakładki przypisane do tej kategorii</h4>
+
+@if (Model.Bookmarks != null && Model.Bookmarks.Any())
+{
+    <table class="table table-hover mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Opis zakładki</th>
+                <th>Adres URL</th>
+                <th>Data utworzenia</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Bookmarks)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                    <td>
+                        <a href="@item.Url" target="_blank" class="btn btn-sm btn-success">Przejdź do linku</a>
+                    </td>
+                    <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p class="text-muted mt-3">Brak zakładek przypisanych do tej kategorii.</p>
+}
+
+<div class="mt-4">
+    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Edytuj kategorię</a>
+    <a asp-action="Index" class="btn btn-secondary">Wróć do listy</a>
 </div>
